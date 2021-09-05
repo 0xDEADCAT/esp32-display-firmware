@@ -20,7 +20,7 @@
 #include "esp_netif.h"
 #include "esp_smartconfig.h"
 #include "driver/gpio.h"
-#include "epd4in2-demo.h"
+#include "display_driver.h"
 
 #define GPIO_INPUT_IO_0     GPIO_NUM_18
 #define GPIO_INPUT_PIN_SEL  (1ULL<<GPIO_INPUT_IO_0)
@@ -237,7 +237,7 @@ void app_main(void)
 
     initialize_wifi_reset_button();
     initialise_wifi();
-    xTaskCreate(setup,
+    xTaskCreate(display_driver,
                 "display_driver",
                 8192,
                 NULL,
