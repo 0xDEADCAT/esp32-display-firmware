@@ -1,0 +1,2 @@
+idf_component_register(SRCS "src/DEV_Config.c" "src/font8.c" "src/font12.c" "src/font16.c" "src/font20.c" "src/font24.c" "src/GUI_Paint.c" "src/utility/EPD_4in2.c" 
+                       INCLUDE_DIRS "src" "src/utility")

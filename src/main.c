@@ -20,8 +20,9 @@
 #include "esp_netif.h"
 #include "esp_smartconfig.h"
 #include "driver/gpio.h"
+#include "epd4in2-demo.h"
 
-#define GPIO_INPUT_IO_0     18
+#define GPIO_INPUT_IO_0     GPIO_NUM_18
 #define GPIO_INPUT_PIN_SEL  (1ULL<<GPIO_INPUT_IO_0)
 #define ESP_INTR_FLAG_DEFAULT 0
 
@@ -81,7 +82,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
         // If couldn't connect, initiate smartconfig Wi-Fi provisioning setup
         if (ret != ESP_OK) {
-            xTaskCreate(smartconfig_wifi_setup_task, "smartconfig_example_task", 4096, NULL, 3, &smartconfig_task_handle);
+            xTaskCreate(smartconfig_wifi_setup_task, "smartconfig_example_task", 4096, NULL, 1, &smartconfig_task_handle);
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED) {
         // Turn on Wi-Fi reset button interrupt
@@ -214,7 +215,7 @@ static void initialize_wifi_reset_button(void) {
     //create a queue to handle gpio event from isr
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
     //start gpio task
-    xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 10, NULL);
+    xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 2, NULL);
 
     //install gpio isr service
     gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
@@ -236,4 +237,10 @@ void app_main(void)
 
     initialize_wifi_reset_button();
     initialise_wifi();
+    xTaskCreate(setup,
+                "display_driver",
+                8192,
+                NULL,
+                1,
+                NULL);
 }
