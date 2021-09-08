@@ -1,8 +1,4 @@
-/* Includes ------------------------------------------------------------------*/
-#include <EPD.h>
-#include <GUI_Paint.h>
-#include "ImageData.h"
-#include <stdlib.h>
+#include "display_driver.h"
 
 /* Entry point ----------------------------------------------------------------*/
 static void display_setup()
@@ -14,8 +10,6 @@ static void display_setup()
   EPD_4IN2_Init();
   EPD_4IN2_Clear();
   DEV_Delay_ms(500);
-
-
 }
 
 void display_driver(void* arg) {

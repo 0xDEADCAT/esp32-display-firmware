@@ -8,6 +8,7 @@
         "epd_4in2.h": "c",
         "gui_paint.h": "c",
         "imagedata.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "display_driver.h": "c"
     }
 }
