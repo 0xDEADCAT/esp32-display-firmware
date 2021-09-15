@@ -8,16 +8,29 @@
 #include "nvs_flash.h"
 #include "wifi_driver.h"
 #include "display_driver.h"
+#include "http_driver.h"
+
+QueueHandle_t displayQueue;
 
 void app_main(void)
 {
     ESP_ERROR_CHECK( nvs_flash_init() );
 
     wifi_driver();
-    xTaskCreate(display_driver,
-                "display_driver",
-                8192,
-                NULL,
-                1,
-                NULL);
+    displayQueue = xQueueCreate(5, sizeof( struct DisplayMessage));
+    if (displayQueue != NULL) {
+        xTaskCreate(display_driver,
+                    "display_driver",
+                    8192,
+                    ( void * ) &displayQueue,
+                    1,
+                    NULL);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        xTaskCreate(http_driver,
+                    "http_driver",
+                    8192,
+                    ( void * ) &displayQueue,
+                    1,
+                    NULL);
+    }
 }

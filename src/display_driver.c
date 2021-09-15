@@ -1,5 +1,10 @@
 #include "display_driver.h"
 
+//Create a new image cache
+UBYTE *BlackImage;
+
+UWORD Imagesize;
+
 /* Entry point ----------------------------------------------------------------*/
 static void display_setup()
 {
@@ -12,13 +17,30 @@ static void display_setup()
   DEV_Delay_ms(500);
 }
 
-void display_driver(void* arg) {
+static void display_message(struct DisplayMessage* message) {
+  EPD_4IN2_Init();
+  EPD_4IN2_Clear();
+  DEV_Delay_ms(500);
+
+  printf("SelectImage:BlackImage\r\n");
+  Paint_SelectImage(BlackImage);
+  Paint_Clear(WHITE);
+
+  Paint_DrawString_EN(40, 60, message->ucData, &Font24, WHITE, BLACK);
+  printf("EPD_Display\r\n");
+  EPD_4IN2_Display(BlackImage);
+  DEV_Delay_ms(2000);
+
+  printf("Goto Sleep...\r\n");
+  EPD_4IN2_Sleep();
+}
+
+void display_driver(void * pvParameters) {
+  QueueHandle_t* displayQueue = (QueueHandle_t*) pvParameters;
   display_setup();
 
-  //Create a new image cache
-  UBYTE *BlackImage;
   /* you have to edit the startup_stm32fxxx.s file and set a big enough heap size */
-  UWORD Imagesize = ((EPD_4IN2_WIDTH % 8 == 0) ? (EPD_4IN2_WIDTH / 8 ) : (EPD_4IN2_WIDTH / 8 + 1)) * EPD_4IN2_HEIGHT;
+  Imagesize = ((EPD_4IN2_WIDTH % 8 == 0) ? (EPD_4IN2_WIDTH / 8 ) : (EPD_4IN2_WIDTH / 8 + 1)) * EPD_4IN2_HEIGHT;
   if ((BlackImage = (UBYTE *)malloc(Imagesize)) == NULL) {
     printf("Failed to apply for black memory...\r\n");
     while (1);
@@ -40,7 +62,11 @@ void display_driver(void* arg) {
   printf("Goto Sleep...\r\n");
   EPD_4IN2_Sleep();
 
+  struct DisplayMessage message;
+
   while (1) {
-    vTaskDelay(portMAX_DELAY);
+    if(xQueueReceive(*displayQueue, &message, portMAX_DELAY) == pdPASS) {
+      display_message(&message);
+    }
   }
 }

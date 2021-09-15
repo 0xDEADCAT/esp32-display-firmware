@@ -9,6 +9,8 @@
         "gui_paint.h": "c",
         "imagedata.h": "c",
         "task.h": "c",
-        "display_driver.h": "c"
+        "display_driver.h": "c",
+        "queue.h": "c",
+        "http_driver.h": "c"
     }
 }
